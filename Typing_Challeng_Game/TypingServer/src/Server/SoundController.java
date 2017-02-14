@@ -1,0 +1,47 @@
+package Server;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
+
+public class SoundController {
+
+    private Player player;
+    private File f;
+
+    //construcror
+    public SoundController(File f) {
+        this.f = f;
+    }
+
+    public void close() {
+        if (player != null) {
+            player.close();
+        }
+    }
+
+    //sound card
+    public void play() {
+        try {
+            FileInputStream fis = new FileInputStream(f.getAbsolutePath());
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            player = new Player(bis);
+        } catch (FileNotFoundException | JavaLayerException e) {
+            System.out.println(e);
+        }
+
+        //run in new thread to play in background
+        new Thread() {
+            public void run() {
+                try {
+                    player.play();
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+        }.start();
+    }
+}
